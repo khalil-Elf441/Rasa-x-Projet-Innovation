@@ -13,7 +13,7 @@ from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
 
 
-class ActionHelloWorld(Action):
+class ActionCheckRestaurants(Action):
 
     def name(self) -> Text:
         return "action_check_restaurants"
@@ -22,7 +22,7 @@ class ActionHelloWorld(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        dispatcher.utter_message(text="Hello World!")
+        dispatcher.utter_message(text="all the restaurants : r1, r2!")
 
         return []
 #

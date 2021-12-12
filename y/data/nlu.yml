@@ -19,11 +19,13 @@ nlu:
 
 - intent: ask
   examples: |
-    - find me [restaurants](term) nearby
-    - show nearby [restaurants](term)
-- lookup: term
+    - find me restaurants nearby
+    - show nearby restaurants
+    - frn
+
+- intent: self
   examples: |
-    - restaurants
+    - who am i
 
 - intent: goodbye
   examples: |
