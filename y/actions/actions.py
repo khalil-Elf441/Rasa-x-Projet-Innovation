@@ -24,6 +24,25 @@ class ActionCheckRestaurants(Action):
 
         dispatcher.utter_message(text="all the restaurants : r1, r2!")
 
+        import requests
+        auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        hed = {'Authorization': 'Bearer ' + auth_token}
+
+        # data = '{"location": "paris", "term": "restaurant"}'
+
+        import json
+
+        data = {}
+        data['location'] = 'paris'
+        data['term'] = 'restaurant'
+        json_data = json.dumps(data)
+
+        url = 'https://api.yelp.com/v3/businesses/search'
+     
+        response = requests.get(url, params=json.loads(json_data), headers=hed)
+        print(response)
+        print(response.json())
+
         return []
 #
 #
