@@ -22,8 +22,6 @@ class ActionCheckRestaurants(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        
-
         import requests
         auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
         hed = {'Authorization': 'Bearer ' + auth_token}
@@ -47,10 +45,50 @@ class ActionCheckRestaurants(Action):
         # for res in data['businesses']:
         #  print(res['name'])
         
-        restrnts = ', '.join(str(e['name']) for e in data['businesses'])
+        restrnts = '\n '.join(str(data['businesses'].index(e))+" "+str(e['name']) for e in data['businesses'])
         dispatcher.utter_message(text=restrnts)
 
         return []
+
+
+class ActionGetItinerary(Action):
+
+    def name(self) -> Text:
+        return "action_get_itinerary"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        depart = "339 Chem. des Meinajaries, 84000 Avignon"
+        arrivee = "2 Impasse de l'Epi, 84000 Avignon"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/"+depart+"/"+arrivee+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        import json
+
+        response = requests.get(CompletQrCodeLink)
+        print(response)
+        # print(response.json())
+
+        # data = response.json()
+
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+
+        # dispatcher.utter_message(text=data, image = image)
+        dispatcher.utter_message(text="got this link : "+CompletQrCodeLink)
+
+        return []
+
+
+
+
 #
 #
 # class ActionHelloWorld(Action):

@@ -23,6 +23,15 @@ nlu:
     - show nearby restaurants
     - frn
 
+# - intent: ask_time
+#   examples: |
+#     - When does [carrefour](name_of_place) close? 
+
+- intent: ask_path
+  examples: |
+    - how can I go to the restaurant? 
+    - hgr
+
 - intent: self
   examples: |
     - who am i
