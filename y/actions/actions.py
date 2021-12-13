@@ -22,7 +22,7 @@ class ActionCheckRestaurants(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        dispatcher.utter_message(text="all the restaurants : r1, r2!")
+        
 
         import requests
         auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
@@ -33,15 +33,22 @@ class ActionCheckRestaurants(Action):
         import json
 
         data = {}
-        data['location'] = 'paris'
+        data['location'] = 'avignon'
         data['term'] = 'restaurant'
         json_data = json.dumps(data)
 
         url = 'https://api.yelp.com/v3/businesses/search'
      
         response = requests.get(url, params=json.loads(json_data), headers=hed)
-        print(response)
-        print(response.json())
+        #  print(response)
+        #  print(response.json())
+
+        data = response.json()
+        # for res in data['businesses']:
+        #  print(res['name'])
+        
+        restrnts = ', '.join(str(e['name']) for e in data['businesses'])
+        dispatcher.utter_message(text=restrnts)
 
         return []
 #
