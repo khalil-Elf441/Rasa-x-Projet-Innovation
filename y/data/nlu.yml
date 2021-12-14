@@ -20,8 +20,10 @@ nlu:
 - intent: ask
   examples: |
     - find me restaurants nearby
+    - show me restaurants around
     - show nearby restaurants
     - frn
+
 
 # - intent: ask_time
 #   examples: |
@@ -29,8 +31,20 @@ nlu:
 
 - intent: ask_path
   examples: |
-    - how can I go to the restaurant? 
+    - how can I go to the [crous](businesses_places)? 
     - hgr
+- lookup: businesses_places
+  examples: |
+    - crous
+
+- intent: ask_places_from_index
+  examples: |
+    - how can I go to the restaurant number [0](businesses_places_index)? 
+    - hbp
+
+- regex: businesses_places_index
+  examples: |
+    - \d{1,2}
 
 - intent: self
   examples: |

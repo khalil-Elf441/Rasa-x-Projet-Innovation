@@ -25,8 +25,12 @@ intents:
     use_entities: true
 - ask_path:
     use_entities: true
-entities: []
-slots: {}
+entities:
+- businesses_places
+slots:
+  destination:
+    type : list
+    influence_conversation: false
 responses:
   utter_greet:
   - text: Hey! How are you?
@@ -46,5 +50,6 @@ responses:
 actions:
 - action_check_restaurants
 - action_get_itinerary
+- action_get_itinerary_from_index
 forms: {}
 e2e_actions: []

@@ -17,3 +17,8 @@ rules:
   steps:
   - intent: ask
   - action: action_check_restaurants
+
+- rule: how can I go to a place
+  steps:
+  - intent: ask_path
+  - action: action_get_itinerary

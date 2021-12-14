@@ -10,7 +10,12 @@
 from typing import Any, Text, Dict, List
 
 from rasa_sdk import Action, Tracker
+from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
+
+
+
+places_db = {}
 
 
 class ActionCheckRestaurants(Action):
@@ -45,10 +50,17 @@ class ActionCheckRestaurants(Action):
         # for res in data['businesses']:
         #  print(res['name'])
         
-        restrnts = '\n '.join(str(data['businesses'].index(e))+" "+str(e['name']) for e in data['businesses'])
-        dispatcher.utter_message(text=restrnts)
 
+        # fill db places :
+        for e in data['businesses']:
+         places_db[str(data['businesses'].index(e))] = str(e['name'])
+        
+        # group all businesses_places in one String
+        businesses_places = '\n '.join(str(data['businesses'].index(e))+" - "+str(e['name']) for e in data['businesses'])
+        dispatcher.utter_message(text=businesses_places)
+        # return [SlotSet("businesses_places", businesses_places)]
         return []
+
 
 
 class ActionGetItinerary(Action):
@@ -64,9 +76,20 @@ class ActionGetItinerary(Action):
 
         QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
 
-        depart = "339 Chem. des Meinajaries, 84000 Avignon"
-        arrivee = "2 Impasse de l'Epi, 84000 Avignon"
-        GoogleMapsItinerary = "https://www.google.fr/maps/dir/"+depart+"/"+arrivee+"/"
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        destination_place = next(tracker.get_latest_entity_values("businesses_places"), None)
+
+        if not destination_place :
+            msg = "Can you give me your destination ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        msg = f"Your destination is {destination_place}"
+        dispatcher.utter_message(text=msg)
+
+        destination = "2 Impasse de l'Epi, 84000 Avignon"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+destination+"/"
 
         CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
         import json
@@ -74,20 +97,66 @@ class ActionGetItinerary(Action):
         response = requests.get(CompletQrCodeLink)
         print(response)
         # print(response.json())
-
         # data = response.json()
-
         # print(data)
         # for res in data['businesses']:
         #  print(res['name'])
-
         # dispatcher.utter_message(text=data, image = image)
-        dispatcher.utter_message(text="got this link : "+CompletQrCodeLink)
+
+        # utter_message(image=<image url>)
+        dispatcher.utter_message(image=CompletQrCodeLink)
 
         return []
 
 
+class ActionGetItineraryFromIndex(Action):
 
+    def name(self) -> Text:
+        return "action_get_itinerary_from_index"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        destination_place = next(
+            tracker.get_latest_entity_values("businesses_places_index"), None)
+
+        if not destination_place:
+            msg = "Can you give me your destination ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        
+        msg = f"Your destination is to the restaurant number {destination_place}"
+        dispatcher.utter_message(text=msg)
+        return []
+
+        destination = "2 Impasse de l'Epi, 84000 Avignon"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + \
+            default_starting_place_ceri+"/"+destination+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        import json
+
+        response = requests.get(CompletQrCodeLink)
+        print(response)
+        # print(response.json())
+        # data = response.json()
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+        # dispatcher.utter_message(text=data, image = image)
+
+        # utter_message(image=<image url>)
+        dispatcher.utter_message(image=CompletQrCodeLink)
+
+        return []
 
 #
 #
