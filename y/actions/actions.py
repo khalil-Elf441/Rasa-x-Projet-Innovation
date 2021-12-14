@@ -63,7 +63,7 @@ class ActionCheckRestaurants(Action):
         return []
 
 
-
+#  Deprecated
 class ActionGetItinerary(Action):
 
     def name(self) -> Text:
@@ -96,7 +96,14 @@ class ActionGetItinerary(Action):
         import json
 
         response = requests.get(CompletQrCodeLink)
-        print(response)
+        # print(response)
+
+        # download image
+        # img_data = requests.get(CompletQrCodeLink).content
+
+        # with open('QRCode.jpg', 'wb') as handler:
+        #     handler.write(img_data)
+
         # print(response.json())
         # data = response.json()
         # print(data)
@@ -105,7 +112,10 @@ class ActionGetItinerary(Action):
         # dispatcher.utter_message(text=data, image = image)
 
         # utter_message(image=<image url>)
-        dispatcher.utter_message(image=CompletQrCodeLink)
+
+        # msg = f"find the itinerary from this link {response} or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+        dispatcher.utter_message(image=response)
 
         return []
 
@@ -141,18 +151,17 @@ class ActionGetItineraryFromIndex(Action):
             return []
 
         msg = f"Your destination is to the restaurant : {name_of_place}"
-        dispatcher.utter_message(text=msg)
+        # dispatcher.utter_message(text=msg)
         # return []
 
         # destination = "2 Impasse de l'Epi, 84000 Avignon"
-        destination = name_of_place + "84000 Avignon, France"
-        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+destination+"/"
+        default_city_destination = "84000 Avignon, France"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+str(name_of_place)+" "+default_city_destination+"/"
 
         CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
-        import json
-
+        # import json
         response = requests.get(CompletQrCodeLink)
-        print(response)
+        # print(response)
         # print(response.json())
         # data = response.json()
         # print(data)
@@ -161,7 +170,10 @@ class ActionGetItineraryFromIndex(Action):
         # dispatcher.utter_message(text=data, image = image)
 
         # utter_message(image=<image url>)
-        dispatcher.utter_message(image=CompletQrCodeLink)
+        msg = msg + " \n " + "find the itinerary from [this link]("+CompletQrCodeLink+") or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+        # dispatcher.utter_image_url(image=response)
+        # dispatcher.utter_message(image=response)
 
         return []
 
