@@ -57,6 +57,7 @@ class ActionCheckRestaurants(Action):
         
         # group all businesses_places in one String
         businesses_places = '\n '.join(str(data['businesses'].index(e))+" - "+str(e['name']) for e in data['businesses'])
+        businesses_places = "here are the restaurants around \n "+businesses_places
         dispatcher.utter_message(text=businesses_places)
         # return [SlotSet("businesses_places", businesses_places)]
         return []
@@ -122,24 +123,30 @@ class ActionGetItineraryFromIndex(Action):
 
         QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
 
+        # Ceri Adress
         default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
 
-        destination_place = next(
+        destination_place_index = next(
             tracker.get_latest_entity_values("businesses_places_index"), None)
 
-        if not destination_place:
-            msg = "Can you give me your destination ?"
+        if not destination_place_index:
+            msg = "Can you give me your destination index ?"
             dispatcher.utter_message(text=msg)
             return []
 
-        
-        msg = f"Your destination is to the restaurant number {destination_place}"
-        dispatcher.utter_message(text=msg)
-        return []
+        name_of_place = places_db.get(destination_place_index, None)
+        if not destination_place_index:
+            msg = f"I didnt recognize {name_of_place} .is it spelled correctly?"
+            dispatcher.utter_message(text=msg)
+            return []
 
-        destination = "2 Impasse de l'Epi, 84000 Avignon"
-        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + \
-            default_starting_place_ceri+"/"+destination+"/"
+        msg = f"Your destination is to the restaurant : {name_of_place}"
+        dispatcher.utter_message(text=msg)
+        # return []
+
+        # destination = "2 Impasse de l'Epi, 84000 Avignon"
+        destination = name_of_place + "84000 Avignon, France"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+destination+"/"
 
         CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
         import json

@@ -25,11 +25,16 @@ intents:
     use_entities: true
 - ask_path:
     use_entities: true
+- ask_places_from_index:
+    use_entities: true
 entities:
 - businesses_places
+- businesses_places_index
 slots:
   destination:
-    type : list
+    type: rasa.shared.core.slots.ListSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: false
 responses:
   utter_greet:

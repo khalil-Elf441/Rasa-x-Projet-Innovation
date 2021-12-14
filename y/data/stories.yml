@@ -34,18 +34,17 @@ stories:
   - intent: ask
   - action: action_check_restaurants
 
+- story: find itinerary to restaurant
+  steps:
+  - intent: ask_path
+  - action: action_get_itinerary
+
 - story: find restaurants nearby index
   steps:
   - intent: ask
   - action: action_check_restaurants
   - intent: ask_places_from_index
   - action: action_get_itinerary_from_index
-
-- story: find itinerary to restaurant
-  steps:
-  - intent: ask_path
-  - action: action_get_itinerary
-
 
 - story: self story
   steps:
