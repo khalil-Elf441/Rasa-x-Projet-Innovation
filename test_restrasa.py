@@ -1,12 +1,17 @@
-import urllib2
+# import urllib2
+import urllib.request as urllib2
+import urllib
 import json
 import random
 import time
 
-url = 'http://192.168.1.70:5005/webhooks/rest/webhook/'
+ip = "localhost"
+# url = 'http://192.168.1.70:5005/webhooks/rest/webhook/'
+url = 'http://'+ip+':5005/webhooks/rest/webhook/'
 text = "hello"
 
 data = '{"sender":"nao", "message":"' + text + '"}'
+data = urllib.parse.urlencode(data).encode("utf-8")
 
 req = urllib2.Request(url, data=data)
 f = urllib2.urlopen(req)

@@ -31,7 +31,7 @@ stories:
 
 - story: find restaurants nearby
   steps:
-  - intent: ask
+  - intent: ask_abt_restautants
   - action: action_check_restaurants
 
 - story: find itinerary to restaurant
@@ -41,10 +41,29 @@ stories:
 
 - story: find restaurants nearby index
   steps:
-  - intent: ask
+  - intent: ask_abt_restautants
   - action: action_check_restaurants
   - intent: ask_places_from_index
   - action: action_get_itinerary_from_index
+  - intent: affirm
+
+
+- story: find terms nearby from global to detailed
+  steps:
+  - intent: ask_abt_terms
+  - action: action_propose_term_categories
+  - intent: chose_category
+  - action: action_get_user_category_choice
+
+# - story: find restaurants from general to detail
+#   steps:
+#   - intent: ask_abt_restaurants
+#   - action: utter_restaurant_category
+#   - intent: action_get_category
+#   - action: utter_restaurant_time
+#   - intent: action_get_time
+#   - action: get_restaurant_category_time
+
 
 - story: self story
   steps:

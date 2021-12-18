@@ -8,12 +8,12 @@
 # This is a simple example for a custom action which utters "Hello World!"
 
 from typing import Any, Text, Dict, List
-
+import requests
 from rasa_sdk import Action, Tracker
 from rasa_sdk.events import SlotSet
 from rasa_sdk.executor import CollectingDispatcher
-
-
+import json
+import pprint
 
 places_db = {}
 
@@ -27,13 +27,13 @@ class ActionCheckRestaurants(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        import requests
+
         auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
         hed = {'Authorization': 'Bearer ' + auth_token}
 
         # data = '{"location": "paris", "term": "restaurant"}'
 
-        import json
+
 
         data = {}
         data['location'] = 'avignon'
@@ -55,8 +55,15 @@ class ActionCheckRestaurants(Action):
         for e in data['businesses']:
          places_db[str(data['businesses'].index(e))] = str(e['name'])
         
+        # # return only one restaurant ####### Last robot test
+        # dispatcher.utter_message(text="the restaurant is "+data['businesses'][0]['name'])
+        # return []
+
         # group all businesses_places in one String
-        businesses_places = '\n '.join(str(data['businesses'].index(e))+" - "+str(e['name']) for e in data['businesses'])
+        # businesses_places = '\n '.join(str(data['businesses'].index(e))+" - "+str(e['name']) for e in data['businesses'])
+
+        businesses_places = ' '.join(str(data['businesses'].index(e))+" "+str(e['name']) for e in data['businesses'])
+
         businesses_places = "here are the restaurants around \n "+businesses_places
         dispatcher.utter_message(text=businesses_places)
         # return [SlotSet("businesses_places", businesses_places)]
@@ -172,10 +179,118 @@ class ActionGetItineraryFromIndex(Action):
         # utter_message(image=<image url>)
         msg = msg + " \n " + "find the itinerary from [this link]("+CompletQrCodeLink+") or scan this QR Code"
         dispatcher.utter_message(text=msg)
+        # dispatcher.utter_message(text=msg)
         # dispatcher.utter_image_url(image=response)
-        # dispatcher.utter_message(image=response)
+        # dispatcher.utter_message(image=CompletQrCodeLink)
 
         return []
+
+
+# action_get_restaurant_from_index
+
+class ActionGetRestaurantFromIndex(Action):
+
+    def name(self) -> Text:
+        return "action_get_restaurant_from_index"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        destination_place_index = next(tracker.get_latest_entity_values("businesses_places_index"), None)
+
+        if not destination_place_index:
+            msg = "Can you give me your destination index ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        name_of_place = places_db.get(destination_place_index, None)
+        if not destination_place_index:
+            msg = f"I didnt recognize {name_of_place} .Can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        msg = f"Is your destination the restaurant : {name_of_place}?"
+        dispatcher.utter_message(text=msg)
+
+        return []
+
+
+class ActionGetCategoriesFromTerm(Action):
+
+    def name(self) -> Text:
+        return "action_propose_term_categories"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        # head = {'Authorization': 'Bearer ' + auth_token}
+
+        user_term = next(tracker.get_latest_entity_values("term"), None)
+        
+        categories = []
+
+        # Get categories
+        url_categories = 'https://www.yelp.com/developers/documentation/v3/all_category_list/categories.json'
+        response = requests.get(url_categories)
+        categories_json_fetch = response.json()
+
+        # get categories
+        for element in categories_json_fetch:
+            for parent_term in element["parents"]:
+                if parent_term == user_term:
+                    categories.append(element['alias'])
+        #  print(response)
+        # pprint.pprint(response.json())
+
+        # categories = "test"
+        # print(response.json())
+        # data = response.json()
+        categories_as_string = ' or '.join(list(set(str(e) for e in categories))[:5])
+
+        # print(categories)
+        msg = f"which fron the {user_term} s categories you prefer {categories_as_string} ?"
+        dispatcher.utter_message(text=msg)
+
+        return [SlotSet("term_categories", categories)]
+
+
+class ActionGetUserCategoryChoice(Action):
+
+    def name(self) -> Text:
+        return "action_get_user_category_choice"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # user_category_choice = next(tracker.get_slot("category"), None)
+        user_category_choice = next(tracker.get_latest_entity_values("category"), None)
+
+        print(user_category_choice)
+
+        List_categories = tracker.get_slot("term_categories")
+
+        print(List_categories)
+
+        
+
+        if not user_category_choice:
+            msg = f"I didnt recognize {user_category_choice}. Can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return[]
+
+
+
+        if user_category_choice in List_categories:
+            msg = f"Okey I will remenber your category {user_category_choice} !"
+            dispatcher.utter_message(text=msg)
+            return [SlotSet("term_category", user_category_choice)]        
+        
+
+
 
 #
 #

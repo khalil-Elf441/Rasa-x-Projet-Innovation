@@ -13,13 +13,19 @@ import speech_recognition as sr
 import wave
 from ast import literal_eval
 
-# import soundfile
 
-
-def speechRecognition():
+def speechRecognition(data, params):
     r = sr.Recognizer()
 
     audioFileName = 'test.wav'
+    data = base64.b64decode(data)
+    params = base64.b64decode(params)
+    params = literal_eval(params.decode("utf-8"))
+
+    wave_write = wave.open(audioFileName, "w")
+    wave_write.setparams(params)
+    wave_write.writeframes(data)
+    wave_write.close()
 
     audioFile = None
     with sr.AudioFile(audioFileName) as source:
@@ -40,8 +46,8 @@ def transcribe():
     req_data = request.get_json(force=True)
 
     # collect the transcription
-    # result_from_google = speechRecognition(req_data['data'], req_data['params'])
-    result_from_google = speechRecognition()
+    result_from_google = speechRecognition(
+        req_data['data'], req_data['params'])
 
     print(result_from_google)
     # send back the predicted keyword in json format
@@ -49,6 +55,6 @@ def transcribe():
 
     return jsonify(reply)
 
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=False)
-

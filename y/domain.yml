@@ -19,7 +19,7 @@ intents:
     use_entities: true
 - bot_challenge:
     use_entities: true
-- ask:
+- ask_abt_restautants:
     use_entities: true
 - self:
     use_entities: true
@@ -27,11 +27,27 @@ intents:
     use_entities: true
 - ask_places_from_index:
     use_entities: true
+- ask_abt_terms:
+    use_entities: true
+- chose_category:
+    use_entities: true
 entities:
 - businesses_places
 - businesses_places_index
+- term
+- category
 slots:
   destination:
+    type: rasa.shared.core.slots.ListSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: false
+  term_category:
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
+    influence_conversation: false
+  term_categories:
     type: rasa.shared.core.slots.ListSlot
     initial_value: null
     auto_fill: true
@@ -56,5 +72,8 @@ actions:
 - action_check_restaurants
 - action_get_itinerary
 - action_get_itinerary_from_index
+- action_get_restaurant_from_index
+- action_propose_term_categories
+- action_get_user_category_choice
 forms: {}
 e2e_actions: []

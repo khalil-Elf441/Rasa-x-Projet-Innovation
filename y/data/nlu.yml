@@ -15,20 +15,267 @@ nlu:
     - hey dude
     - goodmorning
     - goodevening
-    - good afternoon
+# - good afternoon
 
-- intent: ask
+- intent: ask_abt_restautants
   examples: |
     - find me restaurants nearby
     - show me restaurants around
     - show me around
-    - show nearby restaurants
-    - frn
+    - show around
 
 
-# - intent: ask_time
+- intent: ask_abt_terms
+  examples: |
+    - find me the [restaurants](term) nearby
+    - show me the [hotels](term) around
+    - show nearby [cafe](term)
+    - find the [bars](term)
+- lookup: term
+  examples: |
+    - restaurants
+    - hotels
+    - cafe
+    - bars
+
+- intent: chose_category
+  examples: |
+    - I want the category [ryokan](category) 
+    - I prefer the category [agriturismi](category) 
+- lookup: category
+  examples: |
+    - absinthebars
+    - afghani       
+    - african       
+    - agriturismi   
+    - airportlounges
+    - andalusian    
+    - arabian       
+    - argentine     
+    - armenian      
+    - asianfusion   
+    - asturian      
+    - australian    
+    - austrian
+    - baguettes
+    - bangladeshi
+    - basque
+    - bavarian
+    - bbq
+    - beachbars
+    - beerbar
+    - beergarden
+    - beerhall
+    - beisl
+    - belgian
+    - bistros
+    - blacksea
+    - brasseries
+    - brazilian
+    - breakfast_brunch
+    - british
+    - buffets
+    - bulgarian
+    - burgers
+    - burmese
+    - cafes
+    - cafeteria
+    - cajun
+    - cambodian
+    - canteen
+    - caribbean
+    - catalan
+    - champagne_bars
+    - cheesesteaks
+    - chicken_wings
+    - chickenshop
+    - chilean
+    - chinese
+    - cigarbars
+    - cocktailbars
+    - comfortfood
+    - corsican
+    - creperies
+    - cuban
+    - currysausage
+    - cypriot
+    - czech
+    - czechslovakian
+    - danish
+    - delis
+    - diners
+    - dinnertheater
+    - divebars
+    - drivethrubars
+    - dumplings
+    - eastern_european
+    - eltern_cafes
+    - eritrean
+    - ethiopian
+    - filipino
+    - fischbroetchen
+    - fishnchips
+    - flatbread
+    - fondue
+    - food_court
+    - foodstands
+    - freiduria
+    - french
+    - galician
+    - gamemeat
+    - gastropubs
+    - gaybars
+    - georgian
+    - german
+    - giblets
+    - gluten_free
+    - greek
+    - guamanian
+    - halal
+    - hawaiian
+    - heuriger
+    - himalayan
+    - hkcafe
+    - honduran
+    - hookah_bars
+    - hotdog
+    - hotdogs
+    - hotel_bar
+    - hotpot
+    - hungarian
+    - iberian
+    - indonesian
+    - indpak
+    - international
+    - irish
+    - irish_pubs
+    - island_pub
+    - israeli
+    - italian
+    - japanese
+    - jewish
+    - kebab
+    - kopitiam
+    - korean
+    - kosher
+    - kurdish
+    - laos
+    - laotian
+    - latin
+    - lounges
+    - lyonnais
+    - malaysian
+    - meatballs
+    - mediterranean
+    - mexican
+    - mideastern
+    - milkbars
+    - modern_australian
+    - modern_european
+    - mongolian
+    - moroccan
+    - mountainhuts
+    - newamerican
+    - newcanadian
+    - newmexican
+    - newzealand
+    - nicaraguan
+    - nightfood
+    - nikkei
+    - noodles
+    - norcinerie
+    - norwegian
+    - opensandwiches
+    - oriental
+    - pakistani
+    - panasian
+    - parma
+    - pensions
+    - persian
+    - peruvian
+    - pfcomercial
+    - pita
+    - pizza
+    - polish
+    - polynesian
+    - popuprestaurants
+    - portuguese
+    - potatoes
+    - poutineries
+    - pubfood
+    - pubs
+    - pulquerias
+    - raw_food
+    - residences
+    - reststops
+    - riceshop
+    - romanian
+    - rotisserie_chicken
+    - russian
+    - ryokan
+    - sakebars
+    - salad
+    - sandwiches
+    - scandinavian
+    - schnitzel
+    - scottish
+    - seafood
+    - serbocroatian
+    - signature_cuisine
+    - singaporean
+    - slovakian
+    - somali
+    - soulfood
+    - soup
+    - southern
+    - spanish
+    - speakeasies
+    - sportsbars
+    - srilankan
+    - steak
+    - sud_ouest
+    - supperclubs
+    - sushi
+    - swabian
+    - swedish
+    - swissfood
+    - syrian
+    - tabac
+    - tabernas
+    - taiwanese
+    - tapas
+    - tapasmallplates
+    - tavolacalda
+    - tex-mex
+    - thai
+    - tikibars
+    - tradamerican
+    - traditional_swedish
+    - trattorie
+    - turkish
+    - ukrainian
+    - uzbek
+    - vegan
+    - vegetarian
+    - venison
+    - vermouthbars
+    - vietnamese
+    - waffles
+    - whiskeybars
+    - wine_bars
+    - wok
+    - wraps
+    - yugoslav
+
+# - intent: ask_abt_time
 #   examples: |
 #     - When does [carrefour](name_of_place) close? 
+#     - What time does the [carrefour](name_of_place) open? 
+#     - What time does the [carrefour](name_of_place) close? 
+
+# - intent: ask_abt_category
+#   examples: |
+#     - I want [arabian](category) restaurant? 
 
 - intent: ask_path
   examples: |
@@ -42,6 +289,7 @@ nlu:
   examples: |
     - how can I get to the restaurant number [0](businesses_places_index)? 
     - How do you go to the restaurant number [0](businesses_places_index)?
+    - number [0](businesses_places_index)
     - hbp
 
 - regex: businesses_places_index

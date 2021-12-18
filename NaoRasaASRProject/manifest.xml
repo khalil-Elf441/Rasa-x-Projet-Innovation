@@ -20,8 +20,6 @@
     <sentence lang="en_US">Start my project</sentence>
     <sentence lang="fr_FR">Lance mon projet</sentence>
    </triggerSentences>
-   <loadingResponses/>
-   <autonomous/>
    <permissions/>
   </behaviorContent>
  </contents>

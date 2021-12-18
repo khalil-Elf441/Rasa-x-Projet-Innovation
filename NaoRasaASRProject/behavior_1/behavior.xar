@@ -7,7 +7,8 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
         # serveur rasa : rasa run -m models --enable-api --cors “*” --debug
-        self.url = 'http://192.168.1.70:5005/webhooks/rest/webhook/'
+#        self.url = 'http://192.168.1.70:5005/webhooks/rest/webhook/'
+        self.url = 'http://localhost:5005/webhooks/rest/webhook/'
         self.text = "Bonjour je suis à votre disposition." #None
         self.newCall = True
 
@@ -192,7 +193,8 @@ class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
         # serveur ASR : python googleSR_server.py
-        self.url = 'http://192.168.1.57:5000/google?'
+#        self.url = 'http://192.168.1.57:5000/google?'
+        self.url = 'http://localhost:5000/google?'
 
     def onLoad(self):
         pass
