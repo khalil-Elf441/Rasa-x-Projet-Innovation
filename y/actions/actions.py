@@ -374,6 +374,7 @@ class ActionGetUserCategoryChoice(Action):
             dispatcher.utter_message(text=msg)
             return [SlotSet("term_category", user_category_choice)]    
 
+target_term_data_details = ""
 
 class ActionPointTerm(Action):
 
@@ -409,12 +410,9 @@ class ActionPointTerm(Action):
             head = {'Authorization': 'Bearer ' + auth_token}
             term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + targetId
             response = requests.get(term_details_ylp_link, headers=head)
-            data = response.json()
+            target_term_data_details = response.json()
 
-            print(data)
-
-
-
+            print(target_term_data_details)
 
         msg = "Now that I know your favorite restaurant I can give you more informations"
         dispatcher.utter_message(text=msg)
