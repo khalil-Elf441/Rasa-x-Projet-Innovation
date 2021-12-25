@@ -411,13 +411,154 @@ class ActionPointTerm(Action):
             term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + targetId
             response = requests.get(term_details_ylp_link, headers=head)
             target_term_data_details = response.json()
+            data = response.json()
 
+            print("--> target_term_data_details")
             print(target_term_data_details)
 
         msg = "Now that I know your favorite restaurant I can give you more informations"
         dispatcher.utter_message(text=msg)
+        return [SlotSet("target_term_id", data["id"])]
+
+
+class ActionHelloWorld(Action):
+
+    def name(self) -> Text:
+        return "action_get_contact"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        print("target_term_data_details <--")
+        print(target_term_data_details)
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        print(requested_term_id)
+
+        if requested_term_id is not None:
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+            response = requests.get(term_details_ylp_link, headers=head)
+            data = response.json()
+            phone = data["phone"]
+            msg = f"You can contact at {phone}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        if target_term_data_details:
+            phone = target_term_data_details["phone"]
+            msg = f"You can contact at {phone}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        dispatcher.utter_message(text="ups you should answer some questions before coming to this information")
         return []
 
+
+class ActionHelloWorld(Action):
+
+    def name(self) -> Text:
+        return "action_get_rating"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        print("target_term_data_details <--")
+        print(target_term_data_details)
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        print(requested_term_id)
+
+        if requested_term_id is not None:
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+            response = requests.get(term_details_ylp_link, headers=head)
+            data = response.json()
+            rating = data["rating"]
+            msg = f"The rating is {rating}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        dispatcher.utter_message(
+            text="ups you should answer some questions before coming to this information")
+        return []
+
+
+class ActionGetItineraryFromIndex(Action):
+
+    def name(self) -> Text:
+        return "action_get_itinerary_term"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        # Ceri Adress
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        if not requested_term_id:
+            msg = "ups I forget your destination"
+            dispatcher.utter_message(text=msg)
+            return []
+        
+
+        auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        head = {'Authorization': 'Bearer ' + auth_token}
+        term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+        response = requests.get(term_details_ylp_link, headers=head)
+        data = response.json()
+        name_of_place = data["name"]
+
+        print(name_of_place)
+
+        # if not destination_place_index:
+        #     msg = f"I didnt recognize {name_of_place} .is it spelled correctly?"
+        #     dispatcher.utter_message(text=msg)
+        #     return []
+
+        msg = f"Your destination is to the restaurant : {name_of_place}"
+
+        place_adress = data["location"]["address1"]
+        # dispatcher.utter_message(text=msg)
+        # return []
+
+        print("Place Adress "+place_adress)
+
+        # destination = "2 Impasse de l'Epi, 84000 Avignon"
+        default_city_destination = " 84000 Avignon, France"
+
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + \
+            default_starting_place_ceri+"/" + \
+            str(place_adress)+" "+default_city_destination+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        # import json
+        response = requests.get(CompletQrCodeLink)
+        # print(response)
+        # print(response.json())
+        # data = response.json()
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+        # dispatcher.utter_message(text=data, image = image)
+
+        # utter_message(image=<image url>)
+        msg = msg + " \n " + "find the itinerary from [this link]("+CompletQrCodeLink+") or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+
+        return []
 
 #
 #

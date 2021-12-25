@@ -56,6 +56,15 @@ stories:
   - action: action_get_user_category_choice
   - intent: chose_term_from_the_propose
   - action: action_point_term
+  - intent: ask_abt_contact
+  - action: action_get_contact
+  - intent: ask_abt_rating
+  - action: action_get_rating
+  - intent: ask_abt_itinerary
+  - action: action_get_itinerary_term 
+# rating
+# price
+# contact 
 # - story: find restaurants from general to detail
 #   steps:
 #   - intent: ask_abt_restaurants

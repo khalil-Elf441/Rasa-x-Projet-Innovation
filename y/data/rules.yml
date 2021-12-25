@@ -24,6 +24,21 @@ rules:
   - action: action_get_itinerary
 
 
+- rule: general to detail item
+  steps:
+  - intent: chose_term_from_the_propose
+  - action: action_point_term
+
+- rule: display contact informations
+  steps:
+  - intent: ask_abt_contact
+  - action: action_get_contact
+
+- rule: get the itinerary of the term
+  steps:
+  - intent: ask_abt_itinerary
+  - action: action_get_itinerary_term
+
 # - rule: how can I go to a place
 #   steps:
 #   - intent: chose_category

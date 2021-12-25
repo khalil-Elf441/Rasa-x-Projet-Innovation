@@ -42,6 +42,7 @@ nlu:
   examples: |
     - I choose the term [1](term_index)
     - I choose the term number [2](term_index)
+    - I choose the term index [2](term_index)
 - regex: term_index
   examples: |
     - \d{1,2}
@@ -53,6 +54,18 @@ nlu:
 #     - 3
 #     - 4
 #     - 5
+
+- intent: ask_abt_contact
+  examples: |
+    - Can you display contact informations
+
+- intent: ask_abt_rating
+  examples: |
+    - What is the rating 
+
+- intent: ask_abt_itinerary
+  examples: |
+    - give me the directions to this place 
 
 - intent: chose_category
   examples: |

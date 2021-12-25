@@ -33,6 +33,12 @@ intents:
     use_entities: true
 - chose_term_from_the_propose:
     use_entities: true
+- ask_abt_contact:
+    use_entities: true 
+- ask_abt_rating:
+    use_entities: true  
+- ask_abt_itinerary:
+    use_entities: true    
 entities:
 - businesses_places
 - businesses_places_index
@@ -60,6 +66,9 @@ slots:
     initial_value: null
     auto_fill: true
     influence_conversation: false
+  target_term_id:
+    type: text
+    influence_conversation: false
 responses:
   utter_greet:
   - text: Hey! How are you?
@@ -84,5 +93,8 @@ actions:
 - action_propose_term_categories
 - action_get_user_category_choice
 - action_point_term
+- action_get_contact
+- action_get_rating
+- action_get_itinerary_term
 forms: {}
 e2e_actions: []
