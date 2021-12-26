@@ -72,4 +72,505 @@ class ActionCheckRestaurants(Action):
         return []
 
 
-t
+#  Deprecated
+class ActionGetItinerary(Action):
+
+    def name(self) -> Text:
+        return "action_get_itinerary"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        destination_place = next(tracker.get_latest_entity_values("businesses_places"), None)
+
+        if not destination_place :
+            msg = "Can you give me your destination ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        msg = f"Your destination is {destination_place}"
+        dispatcher.utter_message(text=msg)
+
+        destination = "2 Impasse de l'Epi, 84000 Avignon"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+destination+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        import json
+
+        response = requests.get(CompletQrCodeLink)
+        # print(response)
+
+        # download image
+        # img_data = requests.get(CompletQrCodeLink).content
+
+        # with open('QRCode.jpg', 'wb') as handler:
+        #     handler.write(img_data)
+
+        # print(response.json())
+        # data = response.json()
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+        # dispatcher.utter_message(text=data, image = image)
+
+        # utter_message(image=<image url>)
+
+        # msg = f"find the itinerary from this link {response} or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+        dispatcher.utter_message(image=response)
+
+        return []
+
+
+class ActionGetItineraryFromIndex(Action):
+
+    def name(self) -> Text:
+        return "action_get_itinerary_from_index"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        # Ceri Adress
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        destination_place_index = next(
+            tracker.get_latest_entity_values("businesses_places_index"), None)
+
+        if not destination_place_index:
+            msg = "Can you give me your destination index ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        name_of_place = places_db.get(destination_place_index, None)
+        if not destination_place_index:
+            msg = f"I didnt recognize {name_of_place} .is it spelled correctly?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        msg = f"Your destination is to the restaurant : {name_of_place}"
+        # dispatcher.utter_message(text=msg)
+        # return []
+
+        # destination = "2 Impasse de l'Epi, 84000 Avignon"
+        default_city_destination = "84000 Avignon, France"
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + default_starting_place_ceri+"/"+str(name_of_place)+" "+default_city_destination+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        # import json
+        response = requests.get(CompletQrCodeLink)
+        # print(response)
+        # print(response.json())
+        # data = response.json()
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+        # dispatcher.utter_message(text=data, image = image)
+
+        # utter_message(image=<image url>)
+        msg = msg + " \n " + "find the itinerary from [this link]("+CompletQrCodeLink+") or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+        # dispatcher.utter_message(text=msg)
+        # dispatcher.utter_image_url(image=response)
+        # dispatcher.utter_message(image=CompletQrCodeLink)
+
+        return []
+
+
+# action_get_restaurant_from_index
+
+class ActionGetRestaurantFromIndex(Action):
+
+    def name(self) -> Text:
+        return "action_get_restaurant_from_index"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        destination_place_index = next(tracker.get_latest_entity_values("businesses_places_index"), None)
+
+        if not destination_place_index:
+            msg = "Can you give me your destination index ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        name_of_place = places_db.get(destination_place_index, None)
+        if not destination_place_index:
+            msg = f"I didnt recognize {name_of_place} .Can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        msg = f"Is your destination the restaurant : {name_of_place}?"
+        dispatcher.utter_message(text=msg)
+
+        return []
+
+
+
+parents = ['restaurants','hotels','cafe','bars']
+
+class ActionGetCategoriesFromTerm(Action):
+
+    def name(self) -> Text:
+        return "action_propose_term_categories"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        # head = {'Authorization': 'Bearer ' + auth_token}
+
+        user_term = next(tracker.get_latest_entity_values("term"), None)     
+        categories = []
+
+        # Get categories Static Approch
+        # url_categories = 'https://www.yelp.com/developers/documentation/v3/all_category_list/categories.json'
+        # response = requests.get(url_categories)
+        # categories_json_fetch = response.json()
+
+        # # get categories
+        # for element in categories_json_fetch:
+        #     for parent_term in element["parents"]:
+        #         if parent_term == user_term:
+        #             categories.append(element['alias'])
+        
+
+        #  get categories from neraby approch
+
+        auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        head = {'Authorization': 'Bearer ' + auth_token}
+
+        data = {}
+        data['location'] = 'avignon'
+        data['term'] = user_term
+      
+        json_data = json.dumps(data)
+        response = requests.get(YELP_BUSSINESS_SEARCH_LINK, params=json.loads(json_data), headers=head)
+        data = response.json()
+
+        for term in data['businesses']:
+            for term_categories_res in term["categories"]:
+                if term_categories_res not in parents:
+                    categories.append(term_categories_res['alias'])
+        
+
+
+        #  print(response)
+        # pprint.pprint(response.json())
+
+        # categories = "test"
+        # print(response.json())
+        # data = response.json()
+        categories = list(set(categories))
+
+        categories_as_string = ' or '.join(
+            list(
+                set(
+                    str(e) for e in categories
+                    )
+            )[:5]
+            )
+
+        # print(categories)
+        msg = f"which fron the {user_term} s categories you prefer {categories_as_string} ?"
+        dispatcher.utter_message(text=msg)
+        # , SlotSet("Key2", "Value2")
+
+        # for key in slot_keys_values.keys():
+        #     slot = SlotSet(key, slot_keys_values[key])
+        #     slots.append(slot)
+        # return slots
+        # , SlotSet("term", user_term)
+        return [SlotSet("term_categories", categories)]
+
+
+businesses_places_global = []
+
+
+class ActionGetUserCategoryChoice(Action):
+
+    def name(self) -> Text:
+        return "action_get_user_category_choice"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # user_category_choice = next(tracker.get_slot("category"), None)
+        user_category_choice = next(tracker.get_latest_entity_values("category"), None)
+
+        print(user_category_choice)
+
+        List_categories = tracker.get_slot("term_categories")
+
+        print(List_categories)
+
+        if not user_category_choice:
+            msg = f"I didnt recognize {user_category_choice}. Can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return[]
+
+        if user_category_choice in List_categories:
+            # msg = f"Okey I will remenber your category {user_category_choice} !, Do want it open now now or at specific time ?"
+            saved_term = tracker.get_slot("term")
+
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+
+            # data = '{"location": "paris", "term": "restaurant"}'
+
+            data = {}
+            data['location'] = 'avignon'
+            data['term'] = saved_term
+            data['categories'] = user_category_choice
+
+            print("request")
+            print(data)
+
+            json_data = json.dumps(data)
+
+            response = requests.get(YELP_BUSSINESS_SEARCH_LINK, params=json.loads(json_data), headers=head)
+        #  print(response)
+        #  print(response.json())
+            data = response.json()
+
+            print(data)
+            
+            businesses_places = []
+            # businesses_places_global = []
+            
+            index = 0
+            for place in data['businesses']:
+                index = index + 1
+                place_entry = str(index)+" "+str(place['name'])
+                businesses_places.append(place_entry)
+                businesses_places_global.append(
+                    str(index)+" "+str(place['id']))
+            
+            businesses_places_as_string = ' '.join(businesses_places[:5])
+            # businesses_places_global = businesses_places
+
+            print(businesses_places_as_string)
+
+            # for key in slot_keys_values.keys():
+            #     slot = SlotSet(key, slot_keys_values[key])
+            #     slots.append(slot)
+            # return slots
+
+            msg = f"Here is the {saved_term} with this category {businesses_places_as_string} What term's number will you choose? "
+            dispatcher.utter_message(text=msg)
+            return [SlotSet("term_category", user_category_choice)]    
+
+target_term_data_details = ""
+
+class ActionPointTerm(Action):
+
+    def name(self) -> Text:
+        return "action_point_term"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        term_index = next(tracker.get_latest_entity_values("term_index"), None)
+
+        print(term_index)
+
+        if not term_index:
+            msg = "I couldn't recognise the term index can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return[]
+
+        targetId = ""
+        data = ""
+        # find the id oh the term chose by user
+        if businesses_places_global:
+            print(businesses_places_global)
+            for indexId in businesses_places_global:
+                index,id = indexId.split()
+                if index == term_index:
+                    targetId = id
+                    break
+            
+            # launch get request to the endpoint bussiness id
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + targetId
+            response = requests.get(term_details_ylp_link, headers=head)
+            target_term_data_details = response.json()
+            data = response.json()
+
+            print("--> target_term_data_details")
+            print(target_term_data_details)
+
+        msg = "Now that I know your favorite restaurant I can give you more informations"
+        dispatcher.utter_message(text=msg)
+        return [SlotSet("target_term_id", data["id"])]
+
+
+class ActionHelloWorld(Action):
+
+    def name(self) -> Text:
+        return "action_get_contact"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        print("target_term_data_details <--")
+        print(target_term_data_details)
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        print(requested_term_id)
+
+        if requested_term_id is not None:
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+            response = requests.get(term_details_ylp_link, headers=head)
+            data = response.json()
+            phone = data["phone"]
+            msg = f"You can contact at {phone}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        if target_term_data_details:
+            phone = target_term_data_details["phone"]
+            msg = f"You can contact at {phone}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        dispatcher.utter_message(text="ups you should answer some questions before coming to this information")
+        return []
+
+
+class ActionHelloWorld(Action):
+
+    def name(self) -> Text:
+        return "action_get_rating"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        print("target_term_data_details <--")
+        print(target_term_data_details)
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        print(requested_term_id)
+
+        if requested_term_id is not None:
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+            response = requests.get(term_details_ylp_link, headers=head)
+            data = response.json()
+            rating = data["rating"]
+            msg = f"The rating is {rating}"
+            dispatcher.utter_message(text=msg)
+            return []
+
+        dispatcher.utter_message(
+            text="ups you should answer some questions before coming to this information")
+        return []
+
+
+class ActionGetItineraryFromIndex(Action):
+
+    def name(self) -> Text:
+        return "action_get_itinerary_term"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        import requests
+
+        QrCodeApi = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data="
+
+        # Ceri Adress
+        default_starting_place_ceri = "339 Chem. des Meinajaries, 84000 Avignon"
+
+        requested_term_id = tracker.get_slot("target_term_id")
+
+        if not requested_term_id:
+            msg = "ups I forget your destination"
+            dispatcher.utter_message(text=msg)
+            return []
+        
+
+        auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        head = {'Authorization': 'Bearer ' + auth_token}
+        term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + requested_term_id
+        response = requests.get(term_details_ylp_link, headers=head)
+        data = response.json()
+        name_of_place = data["name"]
+
+        print(name_of_place)
+
+        # if not destination_place_index:
+        #     msg = f"I didnt recognize {name_of_place} .is it spelled correctly?"
+        #     dispatcher.utter_message(text=msg)
+        #     return []
+
+        msg = f"Your destination is to the restaurant : {name_of_place}"
+
+        place_adress = data["location"]["address1"]
+        # dispatcher.utter_message(text=msg)
+        # return []
+
+        print("Place Adress "+place_adress)
+
+        # destination = "2 Impasse de l'Epi, 84000 Avignon"
+        default_city_destination = " 84000 Avignon, France"
+
+        GoogleMapsItinerary = "https://www.google.fr/maps/dir/" + \
+            default_starting_place_ceri+"/" + \
+            str(place_adress)+" "+default_city_destination+"/"
+
+        CompletQrCodeLink = QrCodeApi+GoogleMapsItinerary
+        # import json
+        response = requests.get(CompletQrCodeLink)
+        # print(response)
+        # print(response.json())
+        # data = response.json()
+        # print(data)
+        # for res in data['businesses']:
+        #  print(res['name'])
+        # dispatcher.utter_message(text=data, image = image)
+
+        # utter_message(image=<image url>)
+        msg = msg + " \n " + "find the itinerary from [this link]("+CompletQrCodeLink+") or scan this QR Code"
+        dispatcher.utter_message(text=msg)
+
+        return []
+
+#
+#
+# class ActionHelloWorld(Action):
+#
+#     def name(self) -> Text:
+#         return "action_hello_world"
+#
+#     def run(self, dispatcher: CollectingDispatcher,
+#             tracker: Tracker,
+#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+#
+#         dispatcher.utter_message(text="Hello World!")
+#
+#         return []

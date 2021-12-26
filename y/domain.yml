@@ -44,6 +44,7 @@ entities:
 - businesses_places_index
 - term
 - category
+- term_index
 slots:
   destination:
     type: rasa.shared.core.slots.ListSlot
@@ -91,5 +92,7 @@ actions:
 - action_get_restaurant_from_index
 - action_propose_term_categories
 - action_get_user_category_choice
+- action_get_contact
+- action_get_rating
 forms: {}
 e2e_actions: []
