@@ -41,19 +41,18 @@ nlu:
 - intent: chose_term_from_the_propose
   examples: |
     - I choose the term [1](term_index)
-    - I choose the term number [2](term_index)
-    - I choose the term index [2](term_index)
-- regex: term_index
-  examples: |
-    - \d{1,2}
-
-# - lookup: term_index
+    - I choose the term number [one](term_index)
+    - I choose the term index [two](term_index)
+# - regex: term_index
 #   examples: |
-#     - 1
-#     - 2
-#     - 3
-#     - 4
-#     - 5
+#     - \d{1,2}
+- lookup: term_index
+  examples: |
+    - one
+    - two
+    - three
+    - four
+    - five
 
 - intent: ask_abt_contact
   examples: |

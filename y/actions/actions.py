@@ -387,12 +387,30 @@ class ActionPointTerm(Action):
 
         term_index = next(tracker.get_latest_entity_values("term_index"), None)
 
-        print(term_index)
+        print(f" The term index 1 : {term_index}")
 
         if not term_index:
             msg = "I couldn't recognise the term index can you try again ?"
             dispatcher.utter_message(text=msg)
             return[]
+
+        if term_index == "one":
+            term_index = "1"
+        
+        if term_index == "two":
+            term_index = "2"
+        
+        if term_index == "three":
+            term_index = "3"
+
+        if term_index == "four":
+            term_index = "4"
+        
+        if term_index == "five":
+            term_index = "5"
+        
+        print(f" The term index 2 : {term_index}")
+
 
         targetId = ""
         data = ""
@@ -401,10 +419,13 @@ class ActionPointTerm(Action):
             print(businesses_places_global)
             for indexId in businesses_places_global:
                 index,id = indexId.split()
+                print(f"index {index} , id {id}")
                 if index == term_index:
                     targetId = id
                     break
             
+            print(f"target Id {targetId}")
+
             # launch get request to the endpoint bussiness id
             auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
             head = {'Authorization': 'Bearer ' + auth_token}

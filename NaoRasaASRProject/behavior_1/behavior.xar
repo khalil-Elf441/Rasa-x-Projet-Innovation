@@ -192,9 +192,12 @@ import wave
 class MyClass(GeneratedClass):
     def __init__(self):
         GeneratedClass.__init__(self)
+         self.url = 'http://10.120.28.179:5000/google?'
+#         self.url = 'http://10.120.28.179:5000/google?'
         # serveur ASR : python googleSR_server.py
-#        self.url = 'http://192.168.1.57:5000/google?'
-        self.url = 'http://localhost:5000/google?'
+#         self.url = 'http://192.168.20.1:5000/google?'
+#        self.url = 'http://localhost:5000/google?'
+
 
     def onLoad(self):
         pass

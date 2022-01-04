@@ -34,11 +34,11 @@ intents:
 - chose_term_from_the_propose:
     use_entities: true
 - ask_abt_contact:
-    use_entities: true 
+    use_entities: true
 - ask_abt_rating:
-    use_entities: true  
+    use_entities: true
 - ask_abt_itinerary:
-    use_entities: true    
+    use_entities: true
 entities:
 - businesses_places
 - businesses_places_index
@@ -67,7 +67,9 @@ slots:
     auto_fill: true
     influence_conversation: false
   target_term_id:
-    type: text
+    type: rasa.shared.core.slots.TextSlot
+    initial_value: null
+    auto_fill: true
     influence_conversation: false
 responses:
   utter_greet:
