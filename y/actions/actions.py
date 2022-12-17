@@ -17,6 +17,7 @@ import pprint
 
 places_db = {}
 
+YELP_BUSSINESS_SEARCH_LINK = 'https://api.yelp.com/v3/businesses/search'
 
 class ActionCheckRestaurants(Action):
 
@@ -228,10 +229,8 @@ class ActionGetCategoriesFromTerm(Action):
         # auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
         # head = {'Authorization': 'Bearer ' + auth_token}
 
-        user_term = next(tracker.get_latest_entity_values("term"), None)
-        
+        user_term = next(tracker.get_latest_entity_values("term"), None)     
         categories = []
-
         # Get categories
         url_categories = 'https://www.yelp.com/developers/documentation/v3/all_category_list/categories.json'
         response = requests.get(url_categories)
@@ -253,7 +252,13 @@ class ActionGetCategoriesFromTerm(Action):
         # print(categories)
         msg = f"which fron the {user_term} s categories you prefer {categories_as_string} ?"
         dispatcher.utter_message(text=msg)
+        # , SlotSet("Key2", "Value2")
 
+        # for key in slot_keys_values.keys():
+        #     slot = SlotSet(key, slot_keys_values[key])
+        #     slots.append(slot)
+        # return slots
+        # , SlotSet("term", user_term)
         return [SlotSet("term_categories", categories)]
 
 
@@ -275,17 +280,43 @@ class ActionGetUserCategoryChoice(Action):
 
         print(List_categories)
 
-        
-
         if not user_category_choice:
             msg = f"I didnt recognize {user_category_choice}. Can you try again ?"
             dispatcher.utter_message(text=msg)
             return[]
 
-
-
         if user_category_choice in List_categories:
-            msg = f"Okey I will remenber your category {user_category_choice} !"
+            # msg = f"Okey I will remenber your category {user_category_choice} !, Do want it open now now or at specific time ?"
+            saved_term = tracker.get_slot("term")
+
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+
+            # data = '{"location": "paris", "term": "restaurant"}'
+
+            data = {}
+            data['location'] = 'avignon'
+            data['term'] = saved_term
+
+            # print(saved_term)
+
+            data['categories'] = user_category_choice
+
+            json_data = json.dumps(data)
+
+            response = requests.get(YELP_BUSSINESS_SEARCH_LINK, params=json.loads(json_data), headers=head)
+        #  print(response)
+        #  print(response.json())
+            data = response.json()
+
+            print(data)
+            
+            businesses_places = ' '.join(
+                list(set(str(e['name']) for e in data['businesses']))[:5])
+
+            print(businesses_places)
+
+            msg = f"Here is the {saved_term} with this category {businesses_places}"
             dispatcher.utter_message(text=msg)
             return [SlotSet("term_category", user_category_choice)]        
         
