@@ -54,7 +54,8 @@ stories:
   - action: action_propose_term_categories
   - intent: chose_category
   - action: action_get_user_category_choice
-
+  - intent: chose_term_from_the_propose
+  - action: action_point_term
 # - story: find restaurants from general to detail
 #   steps:
 #   - intent: ask_abt_restaurants

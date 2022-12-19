@@ -38,6 +38,22 @@ nlu:
     - cafe
     - bars
 
+- intent: chose_term_from_the_propose
+  examples: |
+    - I choose the term [1](term_index)
+    - I choose the term number [2](term_index)
+- regex: term_index
+  examples: |
+    - \d{1,2}
+
+# - lookup: term_index
+#   examples: |
+#     - 1
+#     - 2
+#     - 3
+#     - 4
+#     - 5
+
 - intent: chose_category
   examples: |
     - I want the category [ryokan](category) 
@@ -289,8 +305,8 @@ nlu:
   examples: |
     - how can I get to the restaurant number [0](businesses_places_index)? 
     - How do you go to the restaurant number [0](businesses_places_index)?
-    - number [0](businesses_places_index)
-    - hbp
+#    - number [0](businesses_places_index)
+#    - hbp
 
 - regex: businesses_places_index
   examples: |

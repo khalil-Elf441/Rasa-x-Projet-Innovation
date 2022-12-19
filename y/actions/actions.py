@@ -217,6 +217,9 @@ class ActionGetRestaurantFromIndex(Action):
         return []
 
 
+
+parents = ['restaurants','hotels','cafe','bars']
+
 class ActionGetCategoriesFromTerm(Action):
 
     def name(self) -> Text:
@@ -231,23 +234,54 @@ class ActionGetCategoriesFromTerm(Action):
 
         user_term = next(tracker.get_latest_entity_values("term"), None)     
         categories = []
-        # Get categories
-        url_categories = 'https://www.yelp.com/developers/documentation/v3/all_category_list/categories.json'
-        response = requests.get(url_categories)
-        categories_json_fetch = response.json()
 
-        # get categories
-        for element in categories_json_fetch:
-            for parent_term in element["parents"]:
-                if parent_term == user_term:
-                    categories.append(element['alias'])
+        # Get categories Static Approch
+        # url_categories = 'https://www.yelp.com/developers/documentation/v3/all_category_list/categories.json'
+        # response = requests.get(url_categories)
+        # categories_json_fetch = response.json()
+
+        # # get categories
+        # for element in categories_json_fetch:
+        #     for parent_term in element["parents"]:
+        #         if parent_term == user_term:
+        #             categories.append(element['alias'])
+        
+
+        #  get categories from neraby approch
+
+        auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+        head = {'Authorization': 'Bearer ' + auth_token}
+
+        data = {}
+        data['location'] = 'avignon'
+        data['term'] = user_term
+      
+        json_data = json.dumps(data)
+        response = requests.get(YELP_BUSSINESS_SEARCH_LINK, params=json.loads(json_data), headers=head)
+        data = response.json()
+
+        for term in data['businesses']:
+            for term_categories_res in term["categories"]:
+                if term_categories_res not in parents:
+                    categories.append(term_categories_res['alias'])
+        
+
+
         #  print(response)
         # pprint.pprint(response.json())
 
         # categories = "test"
         # print(response.json())
         # data = response.json()
-        categories_as_string = ' or '.join(list(set(str(e) for e in categories))[:5])
+        categories = list(set(categories))
+
+        categories_as_string = ' or '.join(
+            list(
+                set(
+                    str(e) for e in categories
+                    )
+            )[:5]
+            )
 
         # print(categories)
         msg = f"which fron the {user_term} s categories you prefer {categories_as_string} ?"
@@ -260,6 +294,9 @@ class ActionGetCategoriesFromTerm(Action):
         # return slots
         # , SlotSet("term", user_term)
         return [SlotSet("term_categories", categories)]
+
+
+businesses_places_global = []
 
 
 class ActionGetUserCategoryChoice(Action):
@@ -297,10 +334,10 @@ class ActionGetUserCategoryChoice(Action):
             data = {}
             data['location'] = 'avignon'
             data['term'] = saved_term
-
-            # print(saved_term)
-
             data['categories'] = user_category_choice
+
+            print("request")
+            print(data)
 
             json_data = json.dumps(data)
 
@@ -311,16 +348,59 @@ class ActionGetUserCategoryChoice(Action):
 
             print(data)
             
-            businesses_places = ' '.join(
-                list(set(str(e['name']) for e in data['businesses']))[:5])
+            businesses_places = []
+            
+            index = 0
+            for place in data['businesses']:
+                index = index + 1
+                place_entry = str(index)+" "+str(place['name'])
+                businesses_places.append(place_entry)
+            
+            businesses_places_as_string = ' '.join(businesses_places[:5])
 
-            print(businesses_places)
+            businesses_places_global = businesses_places
 
-            msg = f"Here is the {saved_term} with this category {businesses_places}"
+            # businesses_places = ' '.join(
+            #     list(
+            #         set(
+            #             str(count+1)+" "+str(place['name']) for count, place in enumerate(data['businesses'])
+            #             )
+            #         )
+            #     # [:5]
+            # )
+
+               
+
+
+
+            print(businesses_places_as_string)
+
+            msg = f"Here is the {saved_term} with this category {businesses_places_as_string} What term's number will you choose? "
             dispatcher.utter_message(text=msg)
-            return [SlotSet("term_category", user_category_choice)]        
-        
+            return [SlotSet("term_category", user_category_choice)]    
 
+
+        
+class ActionHelloWorld(Action):
+
+    def name(self) -> Text:
+        return "action_point_term"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        term_index = tracker.get_latest_entity_values("term_index")
+        print(term_index)
+
+        if not term_index:
+            msg = "I couldn't recognise the term index can you try again ?"
+            dispatcher.utter_message(text=msg)
+            return[]
+
+        msg = "Now that I know your favorite restaurant I can give you more informations"
+        dispatcher.utter_message(text=msg)
+        return []
 
 
 #
