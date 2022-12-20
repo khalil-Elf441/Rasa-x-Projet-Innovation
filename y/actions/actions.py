@@ -18,6 +18,7 @@ import pprint
 places_db = {}
 
 YELP_BUSSINESS_SEARCH_LINK = 'https://api.yelp.com/v3/businesses/search'
+YELP_BUSSINESS_DETAILS_LINK = "https://api.yelp.com/v3/businesses/"
 
 class ActionCheckRestaurants(Action):
 
@@ -349,39 +350,32 @@ class ActionGetUserCategoryChoice(Action):
             print(data)
             
             businesses_places = []
+            # businesses_places_global = []
             
             index = 0
             for place in data['businesses']:
                 index = index + 1
                 place_entry = str(index)+" "+str(place['name'])
                 businesses_places.append(place_entry)
+                businesses_places_global.append(
+                    str(index)+" "+str(place['id']))
             
             businesses_places_as_string = ' '.join(businesses_places[:5])
-
-            businesses_places_global = businesses_places
-
-            # businesses_places = ' '.join(
-            #     list(
-            #         set(
-            #             str(count+1)+" "+str(place['name']) for count, place in enumerate(data['businesses'])
-            #             )
-            #         )
-            #     # [:5]
-            # )
-
-               
-
-
+            # businesses_places_global = businesses_places
 
             print(businesses_places_as_string)
+
+            # for key in slot_keys_values.keys():
+            #     slot = SlotSet(key, slot_keys_values[key])
+            #     slots.append(slot)
+            # return slots
 
             msg = f"Here is the {saved_term} with this category {businesses_places_as_string} What term's number will you choose? "
             dispatcher.utter_message(text=msg)
             return [SlotSet("term_category", user_category_choice)]    
 
 
-        
-class ActionHelloWorld(Action):
+class ActionPointTerm(Action):
 
     def name(self) -> Text:
         return "action_point_term"
@@ -390,13 +384,37 @@ class ActionHelloWorld(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        term_index = tracker.get_latest_entity_values("term_index")
+        term_index = next(tracker.get_latest_entity_values("term_index"), None)
+
         print(term_index)
 
         if not term_index:
             msg = "I couldn't recognise the term index can you try again ?"
             dispatcher.utter_message(text=msg)
             return[]
+
+        targetId = ""
+        data = ""
+        # find the id oh the term chose by user
+        if businesses_places_global:
+            print(businesses_places_global)
+            for indexId in businesses_places_global:
+                index,id = indexId.split()
+                if index == term_index:
+                    targetId = id
+                    break
+            
+            # launch get request to the endpoint bussiness id
+            auth_token = 'NgF35-znpIaEKTTtAlOqdtY_iBoXM7XnRo2qaYY1uXlyCga7-hltIEGO-qtUsdzAS8ks8VXUBUsU-a22Tqc4Dn3LmOkp0smZH-sTzSFovpYr-xnLeCfshtwM2yC2YXYx'
+            head = {'Authorization': 'Bearer ' + auth_token}
+            term_details_ylp_link = YELP_BUSSINESS_DETAILS_LINK + targetId
+            response = requests.get(term_details_ylp_link, headers=head)
+            data = response.json()
+
+            print(data)
+
+
+
 
         msg = "Now that I know your favorite restaurant I can give you more informations"
         dispatcher.utter_message(text=msg)
